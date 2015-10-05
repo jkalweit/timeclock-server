@@ -11,160 +11,108 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var Views;
 (function (Views) {
-    var TodoLists = (function (_super) {
-        __extends(TodoLists, _super);
-        function TodoLists() {
+    var Shifts = (function (_super) {
+        __extends(Shifts, _super);
+        function Shifts() {
             _super.apply(this, arguments);
         }
-        TodoLists.prototype.componentDidUpdate = function () {
+        Shifts.prototype.componentDidUpdate = function () {
             var domNode = React.findDOMNode(this.refs['listview']);
             $(domNode)['listview']('refresh');
         };
-        TodoLists.prototype.handleKeyUp = function (element, e) {
+        Shifts.prototype.handleKeyUp = function (element, e) {
             if (e.keyCode === 13) {
-                var todoList = {
-                    key: new Date().toISOString(),
-                    text: e.target.value,
-                    todos: {}
-                };
-                this.props.lists.set(todoList.key, todoList);
-                this.setState({ newList: '' });
             }
         };
-        TodoLists.prototype.handleTextChanged = function (e) {
-            this.setState({ newList: e.target.value });
+        Shifts.prototype.handleTextChanged = function (e) {
+            //this.setState({ newList: (e.target as any).value });
         };
-        TodoLists.prototype.render = function () {
+        Shifts.prototype.addShift = function () {
+            var shift = {
+                key: new Date().toISOString(),
+                name: 'Daryl',
+                day: 'Tuesday',
+                start: '4pm',
+                end: '10pm',
+                note: 'A note.'
+            };
+            this.props.shifts.set(shift.key, shift);
+        };
+        Shifts.prototype.render = function () {
             var _this = this;
-            console.log('render TodoLists');
-            var nodes = Utils.toArray(this.props.lists).map(function (list) {
-                return (React.createElement("li", {"key": list.key}, React.createElement("a", {"href": "#editlist", "data-transition": "slide", "onClick": function () { _this.props.edit(list); }}, list.text || '-')));
+            console.log('render list');
+            var shifts = Utils.toArray(this.props.shifts);
+            var dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            var days = Utils.group(shifts, 'day', dayNames);
+            var nodes = [];
+            console.log('groups', days);
+            dayNames.forEach(function (day) {
+                nodes.push(React.createElement("li", {"data-role": "list-divider", "key": day}, day));
+                days[day].forEach(function (shift) {
+                    nodes.push(React.createElement("li", {"key": shift.key}, React.createElement("a", {"href": "#edit", "data-transition": "slide", "onClick": function () { _this.props.edit(shift); }}, React.createElement("h3", null, shift.name || '-'), React.createElement("p", {"className": "ui-li-aside"}, shift.day, " ", shift.start, " - ", shift.end), React.createElement("p", null, shift.note))));
+                });
             });
-            return (React.createElement("div", {"data-role": "page", "id": "list", "ref": "listpage"}, React.createElement("div", {"data-role": "header"}, React.createElement("h4", null, "Todo Lists")), React.createElement("div", {"role": "main", "className": "ui-content"}, React.createElement("ul", {"data-role": "listview", "ref": "listview"}, React.createElement("input", {"type": "text", "value": this.state.newList, "onChange": this.handleTextChanged.bind(this), "ref": function (el) {
-                var input = React.findDOMNode(el);
-                if (input) {
-                    input.focus();
-                    input['onkeyup'] = function (e) { _this.handleKeyUp(input, e); };
-                }
-            }}), nodes)), React.createElement("div", {"data-role": "footer"}, React.createElement("h4", null, "-"))));
+            return (React.createElement("div", {"data-role": "page", "id": "list", "ref": "listpage"}, React.createElement("div", {"data-role": "header"}, React.createElement("h4", null, "Shifts")), React.createElement("div", {"role": "main", "className": "ui-content"}, React.createElement("ul", {"data-role": "listview", "ref": "listview"}, React.createElement("li", null, React.createElement("button", {"onClick": this.addShift.bind(this)}, "Add Shift")), nodes)), React.createElement("div", {"data-role": "footer"}, React.createElement("h4", null, "-"))));
         };
-        return TodoLists;
+        return Shifts;
     })(BaseViews.SyncView);
-    Views.TodoLists = TodoLists;
-    var Todos = (function (_super) {
-        __extends(Todos, _super);
-        function Todos() {
-            _super.apply(this, arguments);
-        }
-        Todos.prototype.componentDidUpdate = function () {
-            var domNode = React.findDOMNode(this.refs['listview']);
-            $(domNode)['listview']('refresh');
-        };
-        Todos.prototype.handleKeyUp = function (element, e) {
-            if (e.keyCode === 13) {
-                var todo = {
-                    key: new Date().toISOString(),
-                    text: e.target.value,
-                    isComplete: false
-                };
-                this.props.list.todos.set(todo.key, todo);
-                this.setState({ newTodo: '' });
-            }
-        };
-        Todos.prototype.handleTextChanged = function (e) {
-            this.setState({ newTodo: e.target.value });
-        };
-        Todos.prototype.remove = function () {
-            if (confirm('Delete list: "' + this.props.list.text + '"?')) {
-                this.props.list.parent.remove(this.props.list.key);
-                window.history.back();
-            }
-        };
-        Todos.prototype.render = function () {
-            var _this = this;
-            console.log('render');
-            var nodes = Utils.toArray(this.props.list.todos).map(function (todo) {
-                return (React.createElement("li", {"key": todo.key}, React.createElement("a", {"href": "#edit", "data-transition": "slide", "onClick": function () { _this.props.edit(todo); }}, todo.text)));
-            });
-            return (React.createElement("div", {"data-role": "page", "id": "editlist", "ref": "listpage"}, React.createElement("div", {"data-role": "header"}, React.createElement("a", {"href": "#", "data-rel": "back", "data-direction": "reverse", "className": "ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back"}, "Back"), React.createElement("h4", null, this.props.list.text || '-'), React.createElement("button", {"onClick": this.remove.bind(this), "className": "ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-delete"}, "Delete")), React.createElement("div", {"role": "main", "className": "ui-content"}, React.createElement("ul", {"data-role": "listview", "ref": "listview"}, React.createElement("input", {"type": "text", "value": this.state.newTodo, "onChange": this.handleTextChanged.bind(this), "ref": function (el) {
-                var input = React.findDOMNode(el);
-                if (input) {
-                    input.focus();
-                    input['onkeyup'] = function (e) { _this.handleKeyUp(input, e); };
-                }
-            }}), nodes)), React.createElement("div", {"data-role": "footer"}, React.createElement("h4", null, "-"))));
-        };
-        return Todos;
-    })(BaseViews.SyncView);
-    Views.Todos = Todos;
-    var TodoEdit = (function (_super) {
-        __extends(TodoEdit, _super);
-        function TodoEdit(props) {
+    Views.Shifts = Shifts;
+    var EditShift = (function (_super) {
+        __extends(EditShift, _super);
+        function EditShift(props) {
             _super.call(this, props);
-            this.state = this.getMutableState(props.todo);
+            this.state = this.getMutableState(props.shift);
         }
-        TodoEdit.prototype.componentWillReceiveProps = function (nextProps) {
+        EditShift.prototype.componentWillReceiveProps = function (nextProps) {
             console.log('nextProps', nextProps);
-            this.setState(this.getMutableState(nextProps.todo));
+            this.setState(this.getMutableState(nextProps.shift));
         };
-        TodoEdit.prototype.getMutableState = function (immutable) {
+        EditShift.prototype.getMutableState = function (immutable) {
             return { mutable: JSON.parse(JSON.stringify(immutable)) };
         };
-        TodoEdit.prototype.saveField = function (propName, e) {
-            this.props.todo.set(propName, e.target.value);
+        EditShift.prototype.saveField = function (propName, e) {
+            this.props.shift.set(propName, e.target.value);
         };
-        TodoEdit.prototype.componentDidUpdate = function () {
+        EditShift.prototype.componentDidUpdate = function () {
             var domNode = React.findDOMNode(this.refs['listview']);
             $(domNode)['listview']('refresh');
         };
-        TodoEdit.prototype.remove = function () {
-            this.props.todo.parent.remove(this.props.todo.key);
+        EditShift.prototype.remove = function () {
+            this.props.shift.parent.remove(this.props.shift.key);
             window.history.back();
         };
-        TodoEdit.prototype.render = function () {
+        EditShift.prototype.render = function () {
             var mutable = (this.state.mutable || {});
-            return (React.createElement("div", {"data-role": "page", "id": "edit", "ref": "editpage"}, React.createElement("div", {"data-role": "header"}, React.createElement("a", {"href": "#", "data-rel": "back", "data-direction": "reverse", "className": "ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back"}, "Back"), React.createElement("h4", null, "Edit"), React.createElement("button", {"onClick": this.remove.bind(this), "className": "ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-delete"}, "Delete")), React.createElement("div", {"role": "main", "className": "ui-content"}, React.createElement("ul", {"data-role": "listview", "ref": "listview"}, React.createElement("li", {"data-role": "fieldcontain"}, React.createElement("label", null, "Name: ", React.createElement("input", {"type": "text", "onBlur": this.saveField.bind(this, 'text'), "value": mutable.text, "onChange": this.handleChange.bind(this, 'mutable', 'text')})))))));
+            return (React.createElement("div", {"data-role": "page", "id": "edit", "ref": "editpage"}, React.createElement("div", {"data-role": "header"}, React.createElement("a", {"href": "#", "data-rel": "back", "data-direction": "reverse", "className": "ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back"}, "Back"), React.createElement("h4", null, "Edit"), React.createElement("button", {"onClick": this.remove.bind(this), "className": "ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-delete"}, "Delete")), React.createElement("div", {"role": "main", "className": "ui-content"}, React.createElement("ul", {"data-role": "listview", "ref": "listview"}, React.createElement("li", {"data-role": "fieldcontain"}, React.createElement("label", null, "Day: ", React.createElement("select", {"type": "text", "onBlur": this.saveField.bind(this, 'day'), "value": mutable.day, "onChange": this.handleChange.bind(this, 'mutable', 'day')}, React.createElement("option", null, "Sunday"), React.createElement("option", null, "Monday"), React.createElement("option", null, "Tuesday"), React.createElement("option", null, "Wednesday"), React.createElement("option", null, "Thursday"), React.createElement("option", null, "Friday"), React.createElement("option", null, "Saturday")))), React.createElement("li", {"data-role": "fieldcontain"}, React.createElement("label", null, "Name: ", React.createElement("input", {"type": "text", "onBlur": this.saveField.bind(this, 'name'), "value": mutable.name, "onChange": this.handleChange.bind(this, 'mutable', 'name')}))), React.createElement("li", {"data-role": "fieldcontain"}, React.createElement("label", null, "Start: ", React.createElement("input", {"type": "text", "onBlur": this.saveField.bind(this, 'start'), "value": mutable.start, "onChange": this.handleChange.bind(this, 'mutable', 'start')})), React.createElement("label", null, "End: ", React.createElement("input", {"type": "text", "onBlur": this.saveField.bind(this, 'end'), "value": mutable.end, "onChange": this.handleChange.bind(this, 'mutable', 'end')})), React.createElement("label", null, "Note: ", React.createElement("input", {"type": "text", "onBlur": this.saveField.bind(this, 'note'), "value": mutable.note, "onChange": this.handleChange.bind(this, 'mutable', 'note')})))))));
         };
-        return TodoEdit;
+        return EditShift;
     })(BaseViews.SyncView);
-    Views.TodoEdit = TodoEdit;
+    Views.EditShift = EditShift;
     var Main = (function (_super) {
         __extends(Main, _super);
         function Main(props) {
             var _this = this;
             _super.call(this, props);
-            var data = { lists: {} };
+            var data = { employees: {}, shifts: {} };
             document.addEventListener('deviceready', function () {
                 console.log('	deviceready 4');
-                var sync = new SyncNodeSocket.SyncNodeSocket('todos', data, 'http://synctodo.azurewebsites.net');
-                //var sync = new SyncNodeSocket.SyncNodeSocket('todos', data, 'http://192.168.77.248:1337');
+                var sync = new SyncNodeSocket.SyncNodeSocket('shifts', data, 'http://localhost:1337');
                 sync.onUpdated(function (updated) {
                     console.log('updated data!', updated);
                     var newState = { db: updated };
-                    if (_this.state.selectedList)
-                        newState.selectedList = updated.lists[_this.state.selectedList.key];
-                    if (!newState.selectedList) {
-                        newState.selectedTodo = null;
-                    }
-                    else if (_this.state.selectedTodo) {
-                        newState.selectedTodo = newState.selectedList.todos[_this.state.selectedTodo.key];
-                    }
+                    if (_this.state.selectedShift)
+                        newState.selectedShift = updated.shifts[_this.state.selectedShift.key];
                     _this.setState(newState);
                 });
             });
-            this.state = { db: data, selectedTodo: null };
+            this.state = { db: data, selectedShift: null };
         }
-        Main.prototype.editList = function (list) {
-            this.setState({ selectedList: list });
-        };
-        Main.prototype.editItem = function (todo) {
-            this.setState({ selectedTodo: todo });
+        Main.prototype.edit = function (shift) {
+            this.setState({ selectedShift: shift });
         };
         Main.prototype.render = function () {
-            return (React.createElement("div", null, React.createElement(TodoLists, {"lists": this.state.db.lists, "edit": this.editList.bind(this)}), this.state.selectedList ?
-                React.createElement(Todos, {"list": this.state.selectedList, "edit": this.editItem.bind(this)})
-                : null, this.state.selectedTodo ?
-                React.createElement(TodoEdit, {"todo": this.state.selectedTodo})
+            return (React.createElement("div", null, React.createElement(Shifts, {"shifts": this.state.db.shifts, "edit": this.edit.bind(this)}), this.state.selectedShift ?
+                React.createElement(EditShift, {"shift": this.state.selectedShift})
                 : null));
         };
         return Main;

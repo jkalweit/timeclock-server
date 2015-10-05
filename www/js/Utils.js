@@ -23,6 +23,20 @@ var Utils;
         return array;
     }
     Utils.toArray = toArray;
+    function group(arr, prop, groupVals) {
+        var groups = {};
+        groupVals.forEach(function (groupVal) {
+            var group = [];
+            arr.forEach(function (item) {
+                if (item[prop] === groupVal) {
+                    group.push(item);
+                }
+            });
+            groups[groupVal] = group;
+        });
+        return groups;
+    }
+    Utils.group = group;
     function formatCurrency(value, precision) {
         if (precision === void 0) { precision = 2; }
         var number = (typeof value === 'string') ? parseInt(value) : value;
