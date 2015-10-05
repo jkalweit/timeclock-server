@@ -96,7 +96,8 @@ var Views;
             var data = { employees: {}, shifts: {} };
             document.addEventListener('deviceready', function () {
                 console.log('	deviceready 4');
-                var sync = new SyncNodeSocket.SyncNodeSocket('shifts', data, 'http://localhost:1337');
+                //var sync = new SyncNodeSocket.SyncNodeSocket('shifts', data, 'http://localhost:1337');
+                var sync = new SyncNodeSocket.SyncNodeSocket('shifts', data, 'http://timeclocker.azurewebsites.net');
                 sync.onUpdated(function (updated) {
                     console.log('updated data!', updated);
                     var newState = { db: updated };
