@@ -56,7 +56,7 @@ var defaultData = {
 };
 
 var syncServer = new Sync.SyncNodeServer('shifts', io, defaultData);
-app.use('/', express.static(path.join(__dirname, '../timeclock/www/')));
+app.use('/', express.static(path.join(__dirname, 'www/')));
 
 // using this for debugging...
 app.get('/reset', function (req, res) {
