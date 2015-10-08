@@ -8,9 +8,9 @@ var app = express();
 var server = http.createServer(app);
 
 app.use(function (req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
+	res.header("Access-Control-Allow-Origin", "*");
+	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+	next();
 });
 
 app.use(bodyParser.json());
@@ -19,58 +19,67 @@ app.use(bodyParser.urlencoded({ extended: true }));
 var io = socketio(server);
 
 var defaultData = {
-    employees: {
-        '0': {
-            key: '0',
-            name: 'Justin',
-            phone: '8035261064'
-	}, 
-	'1': {
-            key: '1',
-            name: 'Matt',
-            phone: ''
-	}
-
-    },
-    //weeks: {
-    //	'0': {
-//		key: '0',
-		shifts: {
-			'0': {
-				key: '0',
-				name: 'Matt',
-				start: '4pm',
-				end: '10pm',
-				note: 'A note!'
-			},
-			'1': {
-				key: '1',
-				name: 'Chris',
-				start: '4pm',
-				end: '10pm',
-				note: ''
-			}
+	employees: {
+		'0': {
+			key: '0',
+			name: 'Justin',
+			phone: '8035261064'
+		}, 
+		'1': {
+			key: '1',
+			name: 'Matt',
+			phone: ''
 		}
-//	}
-//    }
+
+	},
+	//weeks: {
+	//	'0': {
+	//		key: '0',
+	shifts: {
+		'0': {
+			key: '0',
+			name: 'Matt',
+			start: '4pm',
+			end: '10pm',
+			note: 'A note!'
+		},
+		'1': {
+			key: '1',
+			name: 'Chris',
+			start: '4pm',
+			end: '10pm',
+			note: ''
+		}
+	}
+	//	}
+	//    }
 };
 
+var www = path.join(__dirname, '..', 'timeclock', 'www');
+//var www = path.join(__dirname, 'www');
+
 var syncServer = new Sync.SyncNodeServer('shifts', io, defaultData);
-app.use('/', express.static(path.join(__dirname, 'www/')));
+app.use('/', express.static(www));
+app.get('/employees', function(req, res){
+	res.sendfile(path.join(www, 'employees.html'));
+});
+app.get('/shifts', function(req, res){
+	res.sendfile(path.join(www, 'shifts.html'));
+});
 
 // using this for debugging...
 app.get('/reset', function (req, res) {
-    syncServer.resetData(defaultData);
-    res.send('Reset.');
+	syncServer.resetData(defaultData);
+	res.send('Reset.');
 });
 
 app.get('/test', function (req, res) {
-    syncServer.resetData(defaultData);
-    res.send('Test response!');
+	syncServer.resetData(defaultData);
+	res.send('Test response!');
 });
 
 
 var port = process.env.PORT || 1337;
 server.listen(port, function () {
-    console.log('Express is listening on %s:%s', server.address().address, server.address().port);
+	console.log('Express is listening on %s:%s', server.address().address, server.address().port);
 });
